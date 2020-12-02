@@ -11,28 +11,21 @@ def exists(expenses, expense):
         return False
 
 
-with open(INPUT_PATH) as data:
-    expenses = [int(line) for line in data.readlines()]
-
+def get_complement_product(expenses, expected_sum):
     for expense in expenses:
-        complement = 2020 - expense
+        complement = expected_sum - expense
 
         if exists(expenses, complement):
-            print("solution 1:", expense * complement)
-            break
+            return expense * complement
 
-    solution_2_found = False
+
+with open(INPUT_PATH) as data:
+    expenses = [int(line) for line in data.readlines()]
+    print("solution 1:", get_complement_product(expenses, 2020))
 
     for expense in expenses:
-        rest = 2020 - expense
+        rest_product = get_complement_product(expenses, 2020 - expense)
 
-        for sub_expense in expenses:
-            complement = rest - sub_expense
-
-            if exists(expenses, complement):
-                print("solution 2:", expense * sub_expense * complement)
-                solution_2_found = True
-                break
-
-        if solution_2_found:
+        if rest_product:
+            print("solution 2:", expense * rest_product)
             break
