@@ -29,3 +29,4 @@ with open(INPUT_PATH) as data:
         if rest_product:
             print("solution 2:", expense * rest_product)
             break
+
