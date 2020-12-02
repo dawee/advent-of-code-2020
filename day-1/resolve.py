@@ -1,13 +1,14 @@
 import os
 
+
 INPUT_PATH = os.path.realpath("{0}/../input".format(__loader__.path))
+
 
 def exists(expenses, expense):
     try:
         return expenses.index(expense) and True
     except:
         return False
-
 
 
 with open(INPUT_PATH) as data:
