@@ -9,7 +9,7 @@ INPUT_PATH = os.path.realpath("{0}/../input".format(__loader__.path))
 
 class AreaMap:
     def __init__(self, input=None, matrix=None):
-        self.matrix = [[(TREE if char == '#' else OPEN_SQUARE) for char in line] for line in input] if input else matrix
+        self.matrix = [[(TREE if char == '#' else OPEN_SQUARE) for char in line.strip()] for line in input.readlines()] if input else matrix
         self.pointer = (0, 0)
 
     @property
@@ -25,7 +25,7 @@ class AreaMap:
 
     def is_tree(self):
         row, col = self.pointer
-        return self.matrix[row][col % (self.width - 1)] == TREE
+        return self.matrix[row][col % self.width] == TREE
 
     def is_outside(self):
         row, col = self.pointer
