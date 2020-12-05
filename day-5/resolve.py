@@ -1,18 +1,12 @@
 import math
 import os
 
-
 INPUT_PATH = os.path.realpath("{0}/../input".format(__loader__.path))
 
 
-def get_lower_range(value_range):
+def split_range(value_range):
     min_value, max_value = value_range
-    return (min_value,  min_value + math.floor((max_value - min_value) / 2))
-
-
-def get_upper_range(value_range):
-    min_value, max_value = value_range
-    return (min_value + math.ceil((max_value - min_value) / 2), max_value)
+    return (min_value,  min_value + math.floor((max_value - min_value) / 2)), (min_value + math.ceil((max_value - min_value) / 2), max_value)
 
 
 def get_seat_id(boarding_pass):
@@ -21,9 +15,11 @@ def get_seat_id(boarding_pass):
 
     for char in boarding_pass:
         if char in ["F", "B"]:
-            row_range = get_lower_range(row_range) if char == "F" else get_upper_range(row_range)
+            lower_row_range, upper_row_range = split_range(row_range)
+            row_range = lower_row_range if char == "F" else upper_row_range
         elif char in ["L", "R"]:
-            col_range = get_lower_range(col_range) if char == "L" else get_upper_range(col_range)
+            lower_col_range, upper_col_range = split_range(col_range)
+            col_range = lower_col_range if char == "L" else upper_col_range
 
     row, __ = row_range
     col, __ = col_range
