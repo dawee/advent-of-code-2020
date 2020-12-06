@@ -1,6 +1,7 @@
 import math
 import os
 
+
 INPUT_PATH = os.path.realpath("{0}/../input".format(__loader__.path))
 
 
