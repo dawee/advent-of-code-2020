@@ -4,9 +4,9 @@ import sys
 sum_combinations = lambda numbers: [number + other for index, number in enumerate(numbers) for other in numbers[:index]]
 
 
-def find_weakness(numbers, preambule):
+def find_weakness(numbers, preamble):
     for index, number in enumerate(numbers):
-        if index >= preambule and not number in sum_combinations(numbers[index - preambule:index]):
+        if index >= preamble and not number in sum_combinations(numbers[index - preamble:index]):
             return number
 
 
