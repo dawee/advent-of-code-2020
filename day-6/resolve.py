@@ -23,7 +23,9 @@ def get_group_everyone_yes_answers(group):
 
 with open(INPUT_PATH) as input:
     data = input.read()
-    total_anyone_yes_count = sum([len(get_group_anyone_yes_answers(group)) for group in data.split("\n\n")])
+    total_anyone_yes_count = sum(
+        [len(get_group_anyone_yes_answers(group)) for group in data.split("\n\n")])
     print("solution 1:", total_anyone_yes_count)
-    total_everyone_yes_count = sum([len(get_group_everyone_yes_answers(group)) for group in data.split("\n\n")])
+    total_everyone_yes_count = sum(
+        [len(get_group_everyone_yes_answers(group)) for group in data.split("\n\n")])
     print("solution 2:", total_everyone_yes_count)

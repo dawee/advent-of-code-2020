@@ -31,20 +31,25 @@ def move(direction, cardinal_point, value):
 def turn(faced_cardinal_point, angle):
     return int((faced_cardinal_point + angle / 90) % 4)
 
+
 def manhattan_distance(instructions):
     faced_cardinal_point = EAST
-    direction = (0 , 0)
+    direction = (0, 0)
 
     for instruction in instructions:
         if instruction['name'] in CARDINAL_MAP:
-            direction = move(direction, CARDINAL_MAP[instruction['name']], instruction['value'])
+            direction = move(
+                direction, CARDINAL_MAP[instruction['name']], instruction['value'])
         elif instruction['name'] == 'F':
-            direction = move(direction, faced_cardinal_point, instruction['value'])
+            direction = move(direction, faced_cardinal_point,
+                             instruction['value'])
         elif instruction['name'] == 'L':
-            faced_cardinal_point = turn(faced_cardinal_point, -instruction['value'])
+            faced_cardinal_point = turn(
+                faced_cardinal_point, -instruction['value'])
         elif instruction['name'] == 'R':
-            faced_cardinal_point = turn(faced_cardinal_point, instruction['value'])
-    
+            faced_cardinal_point = turn(
+                faced_cardinal_point, instruction['value'])
+
     horizontal, vertical = direction
     return abs(horizontal) + abs(vertical)
 
@@ -52,13 +57,13 @@ def manhattan_distance(instructions):
 def move_waypoint(waypoint, cardinal, value):
     for item in waypoint:
         if is_same_axis(item['cardinal'], cardinal):
-            item['value'] = value - item['value'] if is_opposite(item['cardinal'], cardinal) else item['value'] + value
+            item['value'] = value - item['value'] if is_opposite(
+                item['cardinal'], cardinal) else item['value'] + value
 
             if item['value'] < 0:
                 item['value'] = abs(item['value'])
             else:
                 item['cardinal'] = cardinal
-
 
     return waypoint
 
@@ -66,7 +71,7 @@ def move_waypoint(waypoint, cardinal, value):
 def turn_waypoint(waypoint, angle):
     for item in waypoint:
         item['cardinal'] = turn(item['cardinal'], angle)
-    
+
     return waypoint
 
 
@@ -76,16 +81,15 @@ def move_location(location, waypoint, value):
             if is_same_axis(location_item['cardinal'], waypoint_item['cardinal']):
                 multiplied_value = value * waypoint_item['value']
                 location_item['value'] = multiplied_value - location_item['value'] \
-                        if is_opposite(location_item['cardinal'], waypoint_item['cardinal']) \
-                        else location_item['value'] + multiplied_value
-                
+                    if is_opposite(location_item['cardinal'], waypoint_item['cardinal']) \
+                    else location_item['value'] + multiplied_value
+
                 if location_item['value'] < 0:
                     location_item['value'] = abs(location_item['value'])
                 else:
                     location_item['cardinal'] = waypoint_item['cardinal']
 
     return location
-
 
 
 def manhattan_locations_distance(instructions):
@@ -99,10 +103,10 @@ def manhattan_locations_distance(instructions):
         {"cardinal": NORTH, "value": 0},
     ]
 
-
     for instruction in instructions:
         if instruction['name'] in CARDINAL_MAP:
-            waypoint = move_waypoint(waypoint, CARDINAL_MAP[instruction['name']], instruction['value'])
+            waypoint = move_waypoint(
+                waypoint, CARDINAL_MAP[instruction['name']], instruction['value'])
         elif instruction['name'] == 'F':
             location = move_location(location, waypoint, instruction['value'])
         elif instruction['name'] == 'L':
@@ -113,9 +117,10 @@ def manhattan_locations_distance(instructions):
     return sum([item['value'] for item in location])
 
 
-
-raw_instructions = (INSTRUCTION_PATTERN.match(line).groupdict() for line in sys.stdin)
-instructions = [{'name': instruction['name'], 'value': int(instruction['value'])} for instruction in raw_instructions]
+raw_instructions = (INSTRUCTION_PATTERN.match(line).groupdict()
+                    for line in sys.stdin)
+instructions = [{'name': instruction['name'], 'value': int(
+    instruction['value'])} for instruction in raw_instructions]
 
 print('solution 1:', manhattan_distance(instructions))
 print('solution 2:', manhattan_locations_distance(instructions))

@@ -5,9 +5,9 @@ import time
 import pandas
 
 
-
 def solution_1(bus_ids, departure):
-    df = pandas.DataFrame([{int(bus_id):(timestamp % int(bus_id) == 0) for bus_id in bus_ids.split(',') if bus_id != 'x'} for timestamp in range(departure + 120)])
+    df = pandas.DataFrame([{int(bus_id): (timestamp % int(bus_id) == 0) for bus_id in bus_ids.split(
+        ',') if bus_id != 'x'} for timestamp in range(departure + 120)])
     next_stops = df[df.any(axis=1) & (df.index >= departure)]
     first_stop = next_stops.iloc[0]
     next_time = next_stops.index.tolist()[0]
@@ -18,13 +18,13 @@ def solution_1(bus_ids, departure):
 
 
 def solution_2(bus_ids, departure):
-    buses = {index:int(bus_id) for index, bus_id in enumerate(bus_ids.split(',')) if bus_id != 'x'}
+    buses = {index: int(bus_id) for index, bus_id in enumerate(
+        bus_ids.split(',')) if bus_id != 'x'}
     gaps_to_go = list(buses.keys())
 
     timestamp = 0
     increment = 1
     last_match = None
-
 
     while len(gaps_to_go) > 0:
         gap_to_test = gaps_to_go[-1]

@@ -1,7 +1,8 @@
 import sys
 
 
-sum_combinations = lambda numbers: [number + other for index, number in enumerate(numbers) for other in numbers[:index]]
+def sum_combinations(numbers): return [
+    number + other for index, number in enumerate(numbers) for other in numbers[:index]]
 
 
 def find_weakness(numbers, preamble):

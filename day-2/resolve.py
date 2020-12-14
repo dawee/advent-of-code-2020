@@ -17,14 +17,16 @@ def is_row_weak_valid(row):
 
 def is_row_valid(row):
     positions = (row["pos_1"], row["pos_2"])
-    results = (get_char(row["password"], pos) == row["char"] for pos in positions)
+    results = (get_char(row["password"], pos) == row["char"]
+               for pos in positions)
     matching_results = [result for result in results if result == True]
 
     return len(matching_results) == 1
 
 
 with open(INPUT_PATH) as input:
-    df = pandas.Series(input, dtype="string").str.extract(r"^(?P<pos_1>\d+)\-(?P<pos_2>\d+)\s+(?P<char>\w):\s+(?P<password>\w+)$", expand=True)
+    df = pandas.Series(input, dtype="string").str.extract(
+        r"^(?P<pos_1>\d+)\-(?P<pos_2>\d+)\s+(?P<char>\w):\s+(?P<password>\w+)$", expand=True)
     df["pos_1"] = pandas.to_numeric(df["pos_1"])
     df["pos_2"] = pandas.to_numeric(df["pos_2"])
 
