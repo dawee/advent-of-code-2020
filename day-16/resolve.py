@@ -49,6 +49,14 @@ def is_ticket_valid(ticket, categories_ranges):
     return all((is_value_valid(value, categories_ranges) for value in ticket))
 
 
+def filter_valid_tickets(tickets, categories_ranges):
+    return [ticket for ticket in tickets if is_ticket_valid(ticket, categories_ranges)]
+
+
+def map_all_values_by_index(tickets):
+    return {index: [ticket[index] for ticket in tickets] for index, __ in enumerate(tickets[0])}
+
+
 def sum_invalid_values(nearby_tickets, categories_ranges):
     return sum([
         value
@@ -65,40 +73,44 @@ def identify_possible_categories(values, categories_ranges):
     ]
 
 
+def filter_index_categories(filtered_index_categories, unpicked_categories, all_values_by_index):
+    return {
+        index: (
+            filtered_index_categories[index]
+            if index in filtered_index_categories and len(filtered_index_categories[index]) == 1
+            else identify_possible_categories(values, unpicked_categories)
+        )
+        for index, values in all_values_by_index.items()
+    }
+
+
+def find_unpicked_categories(unpicked_categories, filtered_index_categories):
+    unpicked_names = [
+        category_names[0]
+        for category_names in filtered_index_categories.values()
+        if len(category_names) == 1 and category_names[0] in unpicked_categories
+    ]
+
+    return {name: ranges for name, ranges in unpicked_categories.items() if name not in unpicked_names}
+
+
 def identify_categories(categories_ranges, all_values_by_index):
-    unpicked_categories = categories_ranges
+    unpicked_categories = {**categories_ranges}
     filtered_index_categories = {}
 
     while len(unpicked_categories) > 0:
-        filtered_index_categories = {
-            index: (
-                filtered_index_categories[index]
-                if index in filtered_index_categories and len(filtered_index_categories[index]) == 1
-                else identify_possible_categories(values, unpicked_categories)
-            )
-            for index, values in all_values_by_index.items()
-        }
+        filtered_index_categories = filter_index_categories(
+            filtered_index_categories, unpicked_categories, all_values_by_index)
 
-        unpicked_categories = {**categories_ranges}
-
-        for index, category_names in filtered_index_categories.items():
-            if len(category_names) == 1 and category_names[0] in unpicked_categories:
-                unpicked_categories.pop(category_names[0])
+        unpicked_categories = find_unpicked_categories(
+            unpicked_categories, filtered_index_categories)
 
     return {category_names[0]: index for index, category_names in filtered_index_categories.items()}
 
 
 def my_ticket_product(nearby_tickets, categories_ranges, my_ticket):
-    valid_tickets = [
-        ticket
-        for ticket in nearby_tickets
-        if is_ticket_valid(ticket, categories_ranges)
-    ]
-
-    all_values_by_index = {
-        index: [ticket[index] for ticket in valid_tickets]
-        for index, __ in enumerate(my_ticket)
-    }
+    valid_tickets = filter_valid_tickets(nearby_tickets, categories_ranges)
+    all_values_by_index = map_all_values_by_index(valid_tickets)
 
     departure_categories_indexes = (
         index
@@ -115,6 +127,7 @@ def my_ticket_product(nearby_tickets, categories_ranges, my_ticket):
 
 
 spec = parse_input(sys.stdin.read())
+
 print('solution 1:', sum_invalid_values(
     spec['nearby_tickets'], spec['categories_ranges']))
 
