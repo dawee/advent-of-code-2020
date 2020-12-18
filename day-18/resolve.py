@@ -117,31 +117,24 @@ def apply_operator(left_value, operator, item, add_first=False):
 def rewrite_ast_value_without_add(ast_value):
     operator = None
     left_value = None
-    buffer = []
 
     for item in ast_value:
         if left_value is None:
             left_value = get_value(item, add_first=True)
-            buffer.append({'type': 'number', 'value': left_value})
         elif operator is None:
             operator = get_operator(item)
 
             if operator == 'mul':
-                for previous_item in buffer:
-                    yield previous_item
-
+                yield {'type': 'number', 'value': left_value}
                 yield item
-                buffer = []
                 left_value = None
                 operator = None
         else:
             left_value = apply_operator(
                 left_value, operator, item, add_first=True)
-            buffer = [{'type': 'number', 'value': left_value}]
             operator = None
 
-    for last_item in buffer:
-        yield(last_item)
+    yield {'type': 'number', 'value': left_value}
 
 
 def rewrite_ast_without_add(ast):
