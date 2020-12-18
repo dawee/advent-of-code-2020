@@ -1,6 +1,11 @@
 import sys
 
 
+################
+# AST building #
+################
+
+
 def to_ast_item(expression):
     if expression.isdigit():
         return {'type': 'number', 'value': int(expression)}
@@ -13,12 +18,8 @@ def find_end_parenthesis_index(expression, start_index):
     stack = 0
 
     while index < len(expression):
-        char = expression[index]
-
-        if char == '(':
-            stack += 1
-        elif char == ')':
-            stack -= 1
+        if expression[index] in ['(', ')']:
+            stack += 1 if expression[index] == '(' else -1
 
         if stack == 0:
             break
@@ -56,6 +57,25 @@ def to_ast(expression):
     return {'type': 'ast', 'value': parse_ast_value(expression)}
 
 
+#########
+# Debug #
+#########
+
+def print_ast(ast, indent=0):
+    for item in ast['value']:
+        if item['type'] == 'ast':
+            print('{}ast:'.format(''.rjust(indent)))
+            print_ast(item, indent + 2)
+        else:
+            print('{}{}: {}'.format(''.rjust(indent),
+                                    item['type'], item['value']))
+
+
+##############
+# Assertions #
+##############
+
+
 def assert_value(item):
     assertion = item['type'] in ['number', 'ast']
     message = 'Expected number or AST, got {}'.format(item['type'])
@@ -74,6 +94,11 @@ def assert_ast(item):
     assert assertion, message
 
 
+###############
+# Compute AST #
+###############
+
+
 def get_value(item, add_first=False):
     assert_value(item)
     return item['value'] if item['type'] == 'number' else compute_ast(item, add_first)
@@ -87,24 +112,6 @@ def get_operator(item):
 def apply_operator(left_value, operator, item, add_first=False):
     right_value = get_value(item, add_first)
     return left_value + right_value if operator == 'add' else left_value * right_value
-
-
-def compute_ast(ast, add_first=False):
-    assert_ast(ast)
-
-    operator = None
-    left_value = None
-
-    for item in (rewrite_ast_without_add(ast) if add_first else ast)['value']:
-        if left_value is None:
-            left_value = get_value(item, add_first)
-        elif operator is None:
-            operator = get_operator(item)
-        else:
-            left_value = apply_operator(left_value, operator, item, add_first)
-            operator = None
-
-    return left_value
 
 
 def rewrite_ast_value_without_add(ast_value):
@@ -141,21 +148,37 @@ def rewrite_ast_without_add(ast):
     return {'type': 'ast', 'value': rewrite_ast_value_without_add(ast['value'])}
 
 
-def print_ast(ast, indent=0):
-    for item in ast['value']:
-        if item['type'] == 'ast':
-            print('{}ast:'.format(''.rjust(indent)))
-            print_ast(item, indent + 2)
+def compute_ast(ast, add_first=False):
+    assert_ast(ast)
+
+    operator = None
+    left_value = None
+
+    for item in (rewrite_ast_without_add(ast) if add_first else ast)['value']:
+        if left_value is None:
+            left_value = get_value(item, add_first)
+        elif operator is None:
+            operator = get_operator(item)
         else:
-            print('{}{}: {}'.format(''.rjust(indent),
-                                    item['type'], item['value']))
+            left_value = apply_operator(left_value, operator, item, add_first)
+            operator = None
+
+    return left_value
 
 
-expressions = sys.stdin.read().replace('\r', '').split('\n')
+def compute(expression, add_first=False):
+    return compute_ast(to_ast(expression), add_first)
 
 
-print('solution 1:', sum([compute_ast(to_ast(expression))
-                          for expression in expressions]))
+def compute_sum(expressions, add_first=False):
+    return sum([
+        compute(expression, add_first)
+        for expression in expressions
+    ])
 
-print('solution 2:', sum([compute_ast(to_ast(expression), add_first=True)
-                          for expression in expressions]))
+
+if __name__ == '__main__':
+    expressions = sys.stdin.read().replace('\r', '').split('\n')
+
+    print('solution 1:', compute_sum(expressions))
+    print('solution 2:', compute_sum(expressions, add_first=True))
